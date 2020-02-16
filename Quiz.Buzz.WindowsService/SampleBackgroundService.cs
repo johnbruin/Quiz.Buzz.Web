@@ -87,10 +87,16 @@ namespace DebuggableWindowsService
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
+            logger.Info(e.Data);
+
+            if (e.Data.StartsWith("CLIENT") || e.Data.StartsWith("RESET"))
+            {
+                buzzerManager.AllLightOff();
+            }
+
             if (e.Data.StartsWith("LIGHTSWITCH"))
             {
-                short.TryParse(e.Data.Replace("LIGHTSWITCH", string.Empty), out short playerId);
-                buzzerManager.FlashLight(playerId, 10);
+                short.TryParse(e.Data.Replace("LIGHTSWITCH", string.Empty), out short playerId);                
                 if (buzzerManager.IsLightOn(playerId))
                 {
                     buzzerManager.SetLightOff(playerId);
@@ -99,6 +105,12 @@ namespace DebuggableWindowsService
                 {
                     buzzerManager.SetLightOn(playerId);
                 }
+            }
+
+            if (e.Data.StartsWith("LIGHTFLASH"))
+            {
+                short.TryParse(e.Data.Replace("LIGHTFLASH", string.Empty), out short playerId);
+                buzzerManager.FlashLight(playerId);
             }
 
             if (e.Data.StartsWith("LIGHTON"))

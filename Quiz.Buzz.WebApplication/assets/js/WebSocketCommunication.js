@@ -1,4 +1,19 @@
-﻿var ws;
+﻿const AnswerColor = {
+    Red: 'RED',
+    Blue: 'BLUE',
+    Orange: 'ORANGE',
+    Green: 'GREEN',
+    Yellow: 'YELLOW'
+};
+
+const Command = {
+    LightSwitch: 'LIGHTSWITCH',
+    LightOn: 'LIGHTON',
+    LightOff: 'LIGHTOFF',
+    LightFlash: 'LIGHTFLASH'
+};
+
+var ws;
 var tests = {
     websocket: 'WebSocket' in window
 };
@@ -21,21 +36,44 @@ function setupWebSocket() {
 
     // Captures messages from the server.
     ws.onmessage = function (e) {
-        if (e.data === "CLIENT" || e.data === "QUIT") {
-            return;
-        }        
         console.log(e.data);
 
-        if (e.data.indexOf('RED') === 0) {
-            var playerId = e.data.split("RED").join("");
-            ws.send("LIGHTSWITCH" + playerId);
+        var playerId = 0;
+        var color = "";
+        if (e.data.indexOf(AnswerColor.Red) === 0) {
+            playerId = e.data.split(AnswerColor.Red).join("");
+            color = AnswerColor.Red;
         }
+        else if (e.data.indexOf(AnswerColor.Blue) === 0) {
+            playerId = e.data.split(AnswerColor.Blue).join("");
+            color = AnswerColor.Blue;
+        }
+        else if (e.data.indexOf(AnswerColor.Orange) === 0) {
+            playerId = e.data.split(AnswerColor.Orange).join("");
+            color = AnswerColor.Orange;
+        }
+        else if (e.data.indexOf(AnswerColor.Green) === 0) {
+            playerId = e.data.split(AnswerColor.Green).join("");
+            color = AnswerColor.Green;
+        }
+        else if (e.data.indexOf(AnswerColor.Yellow) === 0) {
+            playerId = e.data.split(AnswerColor.Yellow).join("");
+            color = AnswerColor.Yellow;
+        }
+        else {
+            return;
+        }
+        buzzerEvent(color, playerId);
     };
 
     // When connection closes
     ws.onclose = function () {
         console.log('Closed connection');
     };
+}
+
+function sendWSCommand(command, playerId) {
+    ws.send(command + playerId);
 }
 
 function initWS() {
@@ -48,6 +86,3 @@ function initWS() {
         return;
     }
 }
-
-// Run init function when DOM  content has been loaded
-document.addEventListener('DOMContentLoaded', initWS, false);

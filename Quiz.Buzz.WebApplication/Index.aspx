@@ -17,5 +17,17 @@
     </script>
 </head>
 <body oncontextmenu="return false;">
+    <div id="Main">
+        <div id="Timer"></div>
+        <div id="Players">
+
+        </div>
+        <ul id="Answers">
+            <li id="Blue">I don't know</li>
+            <li id="Orange">42</li>
+            <li id="Green">How should I know?</li>
+            <li id="Yellow">Are you stupid?</li>
+        </ul>
+    </div>
 </body>
 </html>

@@ -52,15 +52,6 @@ namespace Quizz.Buzz
             }
         }
 
-        public void FlashLight(short playerId, short times)
-        {
-            for (int i = 0; i < times; i++)
-            {
-                SetLight(playerId, true);
-                SetLight(playerId, false);
-            }
-        }
-
         public void SetLightOn(short playerId)
         {
             SetLight(playerId, true);
@@ -71,11 +62,21 @@ namespace Quizz.Buzz
             SetLight(playerId, false);
         }
 
+        public void FlashLight(short playerId)
+        {
+            var deviceId = (playerId - 1) / 4;
+            var localDeviceId = (playerId - 1) % 4 + 1;
+            if (deviceId > Buzzers.Count - 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+            Buzzers[deviceId].Flash(localDeviceId);
+        }
+
         public void SetLight(short playerId, bool value)
         {
             var deviceId = (playerId - 1) / 4;
             var localDeviceId = (playerId - 1) % 4 + 1;
-
             if (deviceId > Buzzers.Count - 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(playerId));
@@ -95,7 +96,6 @@ namespace Quizz.Buzz
         {
             var deviceId = (playerId - 1) / 4;
             var localDeviceId = (playerId - 1) % 4 + 1;
-
             if (deviceId > Buzzers.Count - 1)
             {
                 throw new ArgumentOutOfRangeException(nameof(playerId));

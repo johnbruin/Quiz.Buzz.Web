@@ -1,1 +1,56 @@
-﻿
+﻿body {
+    background-color: black;
+    color: white;
+    font-family: sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+}
+#Timer {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#Players {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+}
+.Player div {
+    border: 5px solid;
+    border-color: gray;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 5px;
+    width: 90px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#Answers {
+    margin-top: 100px;
+}
+#Answers li {
+    height: 40px;
+    border: 10px solid;
+    border-radius: 20px;
+    display: flex;
+    padding: 10px;
+    padding-top: 20px;
+    margin: 20px;
+    list-style: none;
+}
+li#Blue, .Player div.BLUE {
+    border-color: dodgerblue
+}
+li#Orange, .Player div.ORANGE {
+    border-color: orange
+}
+li#Green, .Player div.GREEN {
+    border-color: limegreen
+}
+li#Yellow, .Player div.YELLOW {
+    border-color: yellow
+}

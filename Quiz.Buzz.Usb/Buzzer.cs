@@ -20,8 +20,19 @@ namespace Quizz.Buzz
         {
             _device = device ?? throw new ArgumentNullException(nameof(device));
             _playerOffset = playerOffset;
+            Init();
+        }
 
-            var thread = new Thread(ThreadMain);
+        public void Flash(int BuzzerID)
+        {
+            var thread = new Thread(() =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    LightOn(BuzzerID);
+                    LightOff(BuzzerID);
+                }
+            });
             thread.Start();
         }
 
@@ -77,7 +88,7 @@ namespace Quizz.Buzz
             SendData(Lights);
         }
 
-        private void ThreadMain()
+        private void Init()
         {
             ActiveBuzzers[0] = true;
             ActiveBuzzers[1] = true;
@@ -87,11 +98,13 @@ namespace Quizz.Buzz
             _device.MonitorDeviceEvents = true;
             _device.OpenDevice();
             _device.MonitorDeviceEvents = true;
-            _device.ReadReport(OnReport);
-
+            
             AllLightsOff();
 
             IsInitialized = true;
+
+            var thread = new Thread(ReadReport);
+            thread.Start();
         }
 
         private void OnReport(HidReport report)
@@ -126,6 +139,12 @@ namespace Quizz.Buzz
             if (IsBitSet(output[4], 1)) OnAnswerClick(this, new AnswerClickEventArgs(4 + _playerOffset, 4, AnswerColor.Yellow, this));
             if (IsBitSet(output[3], 8)) OnAnswerClick(this, new AnswerClickEventArgs(4 + _playerOffset, 4, AnswerColor.Red, this));
 
+            var thread = new Thread(ReadReport);
+            thread.Start();
+        }
+
+        private void ReadReport()
+        {
             _device.ReadReport(OnReport);
         }
 
