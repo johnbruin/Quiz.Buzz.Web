@@ -69,6 +69,7 @@ function setAnswers(rightAnswer) {
         $("#Name" + i).removeClass(AnswerColor.Orange);
         $("#Name" + i).removeClass(AnswerColor.Green);
         $("#Name" + i).removeClass(AnswerColor.Yellow);
+        $("#Name" + i).removeClass("Wrong");
         sendWSCommand(Command.LightOn, Players[i].PlayerId);             
     }
 
