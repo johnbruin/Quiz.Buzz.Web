@@ -17,16 +17,15 @@
     </script>
 </head>
 <body oncontextmenu="return false;">
-    <div id="Main">
-        <div id="Timer"></div>
-        <div id="Players">
-
-        </div>
+    <div id="Main">       
+        <div id="Players"></div>        
+        <div id="Question">Is this is a very difficult question? With lots and lots of text. Very annoying indeed!<br />Bla bla bla...</div>
+        <div id="Timer">00:00</div>
         <ul id="Answers">
-            <li id="Blue">I don't know</li>
-            <li id="Orange">42</li>
-            <li id="Green">How should I know?</li>
-            <li id="Yellow">Are you stupid?</li>
+            <li id="BLUE">I don't know</li>
+            <li id="ORANGE">42</li>
+            <li id="GREEN">How should I know?</li>
+            <li id="YELLOW">Are you stupid?</li>
         </ul>
     </div>
 </body>

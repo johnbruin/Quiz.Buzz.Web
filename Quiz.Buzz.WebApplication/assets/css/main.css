@@ -7,8 +7,21 @@
 }
 #Timer {
     position: absolute;
+    right: 30px;
+    top: 40px;
+}
+
+#Question {
     top: 0;
-    right: 0;
+    border: 10px solid;
+    border-radius: 20px;
+    border-color: blue;
+    min-height: 40px;
+    padding: 40px;
+    padding-left: 20px;
+    padding-right: 80px;
+    margin-top: 20px;
+    display: flex;
 }
 
 #Players {
@@ -27,30 +40,39 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    color: white;
 }
 
 #Answers {
-    margin-top: 100px;
+    list-style: none;
+    padding: 0;
+    width: 50%;
+    margin-top: 50px;
 }
+
 #Answers li {
-    height: 40px;
     border: 10px solid;
     border-radius: 20px;
+    min-height: 20px;
     display: flex;
-    padding: 10px;
-    padding-top: 20px;
-    margin: 20px;
-    list-style: none;
+    padding: 20px;
+    margin-bottom: 20px;   
+    color: white;
 }
-li#Blue, .Player div.BLUE {
+li#BLUE, .Player div.BLUE {
     border-color: dodgerblue
 }
-li#Orange, .Player div.ORANGE {
+li#ORANGE, .Player div.ORANGE {
     border-color: orange
 }
-li#Green, .Player div.GREEN {
+li#GREEN, .Player div.GREEN {
     border-color: limegreen
 }
-li#Yellow, .Player div.YELLOW {
+li#YELLOW, .Player div.YELLOW {
     border-color: yellow
+}
+
+#Answers li.Wrong, .Player div.Wrong {
+    border-color: gray;
+    color: gray;
 }
