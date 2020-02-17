@@ -5,21 +5,26 @@
     font-size: 24px;
     text-transform: uppercase;
 }
-#Timer {
+
+#Timer, #TimerOuter {
     position: absolute;
     right: 30px;
     top: 40px;
+}
+#Timer {
+    right: 40px;
+    top: 50px;
 }
 
 #Question {
     top: 0;
     border: 10px solid;
     border-radius: 20px;
-    border-color: blue;
+    border-color: darkblue;
     min-height: 40px;
     padding: 40px;
     padding-left: 20px;
-    padding-right: 80px;
+    padding-right: 100px;
     margin-top: 20px;
     display: flex;
 }
@@ -29,18 +34,42 @@
     position: absolute;
     bottom: 0;
 }
-.Player div {
+.Player {
     border: 5px solid;
-    border-color: gray;
+    border-color: darkgray;
     border-radius: 10px;
-    padding: 10px;
     margin: 5px;
     width: 90px;
+    padding: 10px;
     font-size: 18px;
+}
+    .Player div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .Player.Active {
+        border-color: darkblue;
+    }
+    .Player.Wrong {
+        border-color: #444444;
+        color: #444444;
+    }
+
+#btnOK {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 8px solid;
+    border-color: red;
+    border-radius: 20px;
+    padding: 10px;
+    width: 150px;
+    min-height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
 }
 
 #Answers {
@@ -57,22 +86,21 @@
     display: flex;
     padding: 20px;
     margin-bottom: 20px;   
-    color: white;
 }
-li#BLUE, .Player div.BLUE {
+    #Answers li.Wrong {
+        border-color: #444444;
+        color: #444444;
+    }
+
+li#BLUE, .Player.BLUE {
     border-color: dodgerblue
 }
-li#ORANGE, .Player div.ORANGE {
+li#ORANGE, .Player.ORANGE {
     border-color: orange
 }
-li#GREEN, .Player div.GREEN {
+li#GREEN, .Player.GREEN {
     border-color: limegreen
 }
-li#YELLOW, .Player div.YELLOW {
+li#YELLOW, .Player.YELLOW {
     border-color: yellow
-}
-
-#Answers li.Wrong, .Player div.Wrong {
-    border-color: gray;
-    color: gray;
 }

@@ -64,18 +64,7 @@ namespace DebuggableWindowsService
             ws.OnMessage += Ws_OnMessage;            
 
             //Send a message
-            buzzerManager.OnAnswerClick += BuzzerManager_OnAnswerClick;
-     
-            //Wait in a loop
-            while (!stopRequested)
-            {
-                if (stopRequested)
-                    break;
-            }
-            ws.Send("QUIT");
-            ws.Close();
-
-            logger.Debug("Service thread exiting.");
+            buzzerManager.OnAnswerClick += BuzzerManager_OnAnswerClick;   
         }
 
         private void BuzzerManager_OnAnswerClick(object sender, AnswerClickEventArgs ace)

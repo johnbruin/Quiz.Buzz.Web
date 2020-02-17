@@ -1,8 +1,13 @@
-﻿const GameState = {
+﻿const NUMBER_OF_QUESTIONS = 10;
+
+const GameState = {
     Joining: 0,
-    Answering: 1
+    Answering: 1,
+    Start: 2,
+    NextQuestion: 3
 };
 
+var sec;
 var Players = new Array();
 var State;
 var RightAnswerColor = "";
@@ -18,11 +23,12 @@ function buzzerEvent(color, playerId) {
         if (color === AnswerColor.Red) {
             if (findPlayer(playerId) < 0) {
                 if (Players.length === 0) {
-                    StartTimer(10);
+                    StartTimer();
                 }                
                 player = {
                     PlayerId: playerId,
-                    Score: 0                    
+                    Score: 0,
+                    Answer: ""
                 };
                 Players.push(player);
                 index = Players.length - 1;
@@ -36,7 +42,6 @@ function buzzerEvent(color, playerId) {
     }
 
     if (State === GameState.Answering) {
-
         //You cannot answer BOOLEAN questions with the green or yellow buttons
         if (QuestionType === "boolean" && (color === "GREEN" || color === "YELLOW")) {
             return;
@@ -45,9 +50,15 @@ function buzzerEvent(color, playerId) {
         index = findPlayer(playerId);
         if (Players[index].Answer === "") {
             Players[index].Answer = color;
-            $("#Name" + index).addClass(color);
+            $("#Player" + index).addClass("Active");
             sendWSCommand(Command.LightOff, playerId);
         }        
+    }
+
+    if (State === GameState.NextQuestion) {
+        if (color === AnswerColor.Red) {
+            NextQuestion();
+        }
     }
 }
 
@@ -61,17 +72,6 @@ function findPlayer(playerId) {
 }
 
 function setAnswers(rightAnswer) {
-
-    //Init player answers
-    for (var i = 0; i < Players.length; i++) {
-        Players[i].Answer = "";
-        $("#Name" + i).removeClass(AnswerColor.Blue);
-        $("#Name" + i).removeClass(AnswerColor.Orange);
-        $("#Name" + i).removeClass(AnswerColor.Green);
-        $("#Name" + i).removeClass(AnswerColor.Yellow);
-        $("#Name" + i).removeClass("Wrong");
-        sendWSCommand(Command.LightOn, Players[i].PlayerId);             
-    }
 
     switch (rightAnswer) {
         case 0:
@@ -87,19 +87,19 @@ function setAnswers(rightAnswer) {
             RightAnswerColor = AnswerColor.Yellow;
             break;
     }
-    console.log(rightAnswer);
-    console.log(RightAnswerColor);
 }
 
-function StartTimer(seconds) {
-    sec = seconds;
+function StartTimer() {
+    $("#TimerOuter").show();
+    $("#Timer").show();
+    sec = 10;
     Timer();
 }
 
 function Timer() {
     if (sec > 0) {
-        sec--;
-        tim = setTimeout(Timer, 1000);
+        sec = sec - .01;
+        tim = setTimeout(Timer, 10);
     }
     else {
         var timeout = 5000; 
@@ -110,79 +110,113 @@ function Timer() {
             $("#" + RightAnswerColor).removeClass("Wrong");
 
             sendWSCommand("RESET", -1);
-            $("[id^=Name]").addClass("Wrong");
+            $("[id^=Player]").addClass("Wrong");
+            $("[id^=Player]").removeClass("Active");
             for (var i = 0; i < Players.length; i++) {
                 if (Players[i].Answer === RightAnswerColor) {
-                    $("#Name" + i).removeClass("Wrong");
+                    $("#Player" + i).removeClass("Wrong");
+                    $("#Player" + i).addClass(RightAnswerColor);
                     sendWSCommand("LIGHTFLASH", Players[i].PlayerId);
                     Players[i].Score = Players[i].Score + 100;
                 }
                 $("#Score" + i).html(Players[i].Score);
             }
+            $("#TimerOuter").fadeOut();
+            $("#Timer").fadeOut();
         }
         else {
             timeout = 0;
         }
 
         setTimeout(function () {
-            var question = Questions[QuestionNumber];
-            QuestionType = question.type;
-
-            $("#Question").html(question.question);
-
-            var correctAnswer;
-            if (QuestionType === "boolean") {
-                if (question.correctanswer === "True") {
-                    correctAnswer = 0;
-                }
-                else {
-                    correctAnswer = 1;
-                }
-                $("#BLUE").html("TRUE");
-                $("#ORANGE").html("FALSE");
-                $("#GREEN").hide();
-                $("#YELLOW").hide();
-            }
-            else {
-                var answers = new Array();
-                answers.push(question.correct_answer);
-                answers.push(question.incorrect_answers[0]);
-                answers.push(question.incorrect_answers[1]);
-                answers.push(question.incorrect_answers[2]);
-                answers = shuffle(answers);
-                console.log(answers);
-
-                for (var i = 0; i < 4; i++) {
-                    if (answers[i] === question.correct_answer) {
-                        correctAnswer = i;
-                    }               
-                }
-                
-                $("#BLUE").html(answers[0]);
-                $("#ORANGE").html(answers[1]);
-                $("#GREEN").html(answers[2]);
-                $("#YELLOW").html(answers[3]);                
-
-                $("#GREEN").show();
-                $("#YELLOW").show();
-            }
-
-            $("#Answers li").removeClass("Wrong");
-            setAnswers(correctAnswer);
-            State = GameState.Answering;
-            StartTimer(10);
-
-            $("#Question").show();
-            $("#Answers").show();
-
-            QuestionNumber++;
+            State = GameState.NextQuestion;
+            InitPlayers();
+            $("#Answers").fadeOut();
+            $("#TimerOuter").fadeOut();
+            $("#Timer").fadeOut();
+            $("#Question").html("PRESS THE RED BUTTON TO CONTINUE");
+            $("#btnOK").fadeIn();
         }, timeout);        
     }
-    $("#Timer").html("00:" + ("00" + sec).slice(-2));
+    $('#Timer').circleProgress({
+        startAngle: -Math.PI / 2,
+        fill: { color: 'lightgray' },
+        value: 1 - sec / 10,
+        thickness: 40,
+        size: 80,
+        animation: false
+    });
+}
+
+function InitPlayers() {
+    for (var i = 0; i < Players.length; i++) {
+        Players[i].Answer = "";
+        $("#Player" + i).removeClass(AnswerColor.Blue);
+        $("#Player" + i).removeClass(AnswerColor.Orange);
+        $("#Player" + i).removeClass(AnswerColor.Green);
+        $("#Player" + i).removeClass(AnswerColor.Yellow);
+        $("#Player" + i).removeClass("Wrong");
+        sendWSCommand(Command.LightOn, Players[i].PlayerId);
+    }
+}
+
+function NextQuestion() {
+    $("#btnOK").fadeOut();
+    var question = Questions[QuestionNumber];
+    QuestionType = question.type;
+
+    $("#Question").html(question.question);
+
+    var correctAnswer;
+    if (QuestionType === "boolean") {
+        if (question.correctanswer === "True") {
+            correctAnswer = 0;
+        }
+        else {
+            correctAnswer = 1;
+        }
+        $("#BLUE").html("TRUE");
+        $("#ORANGE").html("FALSE");
+        $("#GREEN").hide();
+        $("#YELLOW").hide();
+    }
+    else {
+        var answers = new Array();
+        answers.push(question.correct_answer);
+        answers.push(question.incorrect_answers[0]);
+        answers.push(question.incorrect_answers[1]);
+        answers.push(question.incorrect_answers[2]);
+        answers = shuffle(answers);
+        console.log(answers);
+
+        for (var i = 0; i < 4; i++) {
+            if (answers[i] === question.correct_answer) {
+                correctAnswer = i;
+            }
+        }
+
+        $("#BLUE").html(answers[0]);
+        $("#ORANGE").html(answers[1]);
+        $("#GREEN").html(answers[2]);
+        $("#YELLOW").html(answers[3]);
+
+        $("#GREEN").show();
+        $("#YELLOW").show();
+    }
+
+    $("#Answers li").removeClass("Wrong");
+    setAnswers(correctAnswer);
+    State = GameState.Answering;
+    StartTimer();
+
+    $("#Question").show();
+    $("#Answers").fadeIn();
+
+    QuestionNumber++;
 }
 
 function GetQuestions() {
-    let url = 'https://opentdb.com/api.php?amount=10&category=9&difficulty=easy';
+    let url = 'https://opentdb.com/api.php?amount=' + NUMBER_OF_QUESTIONS + '&category=9&difficulty=easy';
 
     fetch(url)
         .then(resp => resp.json())
@@ -218,9 +252,23 @@ function shuffle(array) {
 
 function Init() {
     initWS();
-    $("#Question").hide();
+
+    $("#Question").html("PRESS THE RED BUTTON ON THE CONTROLLER TO JOIN THE GAME");
+
+    $("#btnOK").hide();
     $("#Answers").hide();
-    $("#Answers li").addClass("Wrong");
+    $("#TimerOuter").hide();
+    $("#Timer").hide();
+
+    $('#TimerOuter').circleProgress({
+        startAngle: -Math.PI / 2,
+        fill: { color: 'lightgray' },
+        value: 1,
+        thickness: 5,
+        size: 100,
+        animation: false
+    });
+
     GetQuestions();
 }
 
