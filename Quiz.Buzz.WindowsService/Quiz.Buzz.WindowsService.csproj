@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DDDC3D49-EA37-4653-9944-712A92E3E1A1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>DebuggableWindowsService</RootNamespace>
-    <AssemblyName>DebuggableWindowsService</AssemblyName>
+    <RootNamespace>Quiz.Buzz.WindowsService</RootNamespace>
+    <AssemblyName>Quiz.Buzz.WindowsService</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -41,6 +41,7 @@
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -62,12 +63,12 @@
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="SampleBackgroundService.cs" />
-    <Compile Include="SampleWindowsService.cs">
+    <Compile Include="BackgroundService.cs" />
+    <Compile Include="WindowsService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SampleWindowsService.Designer.cs">
-      <DependentUpon>SampleWindowsService.cs</DependentUpon>
+    <Compile Include="WindowsService.Designer.cs">
+      <DependentUpon>WindowsService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

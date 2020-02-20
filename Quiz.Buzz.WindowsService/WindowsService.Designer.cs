@@ -1,6 +1,6 @@
-﻿namespace DebuggableWindowsService
+﻿namespace Quiz.Buzz.WindowsService
 {
-    partial class SampleWindowsService
+    partial class WindowsService
     {
         /// <summary> 
         /// Required designer variable.

@@ -20,14 +20,15 @@
 <body oncontextmenu="return false;">
     <div id="Main">       
         <div id="Players"></div>        
-        <div id="Question">Is this is a very difficult question? With lots and lots of text. Very annoying indeed!<br />Bla bla bla...</div>
+        <div id="Question">This is the question?</div>
+        <div id="PlayerScores"></div>
         <div id="TimerOuter"></div>
         <div id="Timer"></div>
         <ul id="Answers">
-            <li id="BLUE">I don't know</li>
-            <li id="ORANGE">42</li>
-            <li id="GREEN">How should I know?</li>
-            <li id="YELLOW">Are you stupid?</li>
+            <li id="BLUE">Blue answer</li>
+            <li id="ORANGE">Orange answer</li>
+            <li id="GREEN">Green answer</li>
+            <li id="YELLOW">Yellow answer</li>
         </ul>
         <div id="btnOK">OK</div>
     </div>

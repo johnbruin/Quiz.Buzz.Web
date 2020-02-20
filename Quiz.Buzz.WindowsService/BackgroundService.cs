@@ -1,70 +1,83 @@
 ﻿using log4net;
 using Quizz.Buzz;
+using System;
+using System.Configuration;
 using System.Threading;
 using WebSocketSharp;
 
-namespace DebuggableWindowsService
+namespace Quiz.Buzz.WindowsService
 {
     /// <summary>
     /// Contains actual background operations that our Windows service performs
     /// </summary>
-    class SampleBackgroundService
+    class BackgroundService
     {
         //Get a logger for this class from log4net LogManager
-        private static ILog logger = LogManager.GetLogger(typeof(SampleBackgroundService));
+        private static ILog logger = LogManager.GetLogger(typeof(BackgroundService));
 
         //Web Socket
-        private static WebSocket ws = new WebSocket("ws://localhost:54086/WebSocketServer/WebSocketServer.ashx");
+        private static WebSocket ws;
 
         //PlayStation Buzzer Manager
         private static BuzzerManager buzzerManager = new BuzzerManager();
-
-        bool stopRequested;
+        readonly bool stopRequested;
+        Thread thread;
 
         //Starts the thread
         public void Start()
         {
-            logger.Debug("Start called.");
+            logger.Info("Start called.");
 
-            Thread thr = new Thread(ServiceThread);
-            thr.Start();
+            //Try to connect to the websocket server
+            var url = ConfigurationManager.AppSettings.Get("WebSocketServerURL");
+            ws = new WebSocket(url);
+            ws.Connect();
+
+            if (ws.IsAlive)
+            {
+                thread = new Thread(ServiceThread);
+                thread.Start();
+            }
+        }
+
+        private void Ws_OnError(object sender, ErrorEventArgs e)
+        {
+            logger.Info(e.Message);
         }
 
         //Stops the thread
         public void Stop()
         {
             logger.Debug("Stop called.");
-            stopRequested = true;
+            thread.Abort();
         }
 
         //Service thread that performs background tasks and writes logs
         private void ServiceThread()
         {
-            logger.Debug("Service thread started.");
+            logger.Info("Service thread started.");
 
             //Wait for Initialization of the BuzzerManager
             buzzerManager.WaitForInitialization();
-            logger.Debug("Buzzers initialized.");
-
-            //Try to connect to the websocket server
-            while (!ws.IsAlive)
-            {
-                try
-                {
-                    ws.Connect();
-                }
-                catch { }
-            }
+            logger.Info("Buzzers initialized.");
 
             //Connected
             ws.Send("SERVER");
-            logger.Debug("Websocket connected.");
+            logger.Info("Websocket connected.");
 
             //Receive a message
-            ws.OnMessage += Ws_OnMessage;            
+            ws.OnMessage += Ws_OnMessage;
 
             //Send a message
-            buzzerManager.OnAnswerClick += BuzzerManager_OnAnswerClick;   
+            buzzerManager.OnAnswerClick += BuzzerManager_OnAnswerClick;
+
+            while (!stopRequested)
+            {
+                if (stopRequested)
+                    break;
+            }
+
+            logger.Info("Service thread exiting.");
         }
 
         private void BuzzerManager_OnAnswerClick(object sender, AnswerClickEventArgs ace)
@@ -85,7 +98,7 @@ namespace DebuggableWindowsService
 
             if (e.Data.StartsWith("LIGHTSWITCH"))
             {
-                short.TryParse(e.Data.Replace("LIGHTSWITCH", string.Empty), out short playerId);                
+                short.TryParse(e.Data.Replace("LIGHTSWITCH", string.Empty), out short playerId);
                 if (buzzerManager.IsLightOn(playerId))
                 {
                     buzzerManager.SetLightOff(playerId);

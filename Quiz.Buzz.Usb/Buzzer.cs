@@ -27,7 +27,7 @@ namespace Quizz.Buzz
         {
             var thread = new Thread(() =>
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     LightOn(BuzzerID);
                     LightOff(BuzzerID);

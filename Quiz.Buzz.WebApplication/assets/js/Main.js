@@ -1,18 +1,19 @@
-﻿const NUMBER_OF_QUESTIONS = 10;
+﻿const NUMBER_OF_QUESTIONS = 2;
 
 const GameState = {
     Joining: 0,
     Answering: 1,
     Start: 2,
-    NextQuestion: 3
+    NextQuestion: 3,
+    GameOver: 4
 };
 
 var sec;
-var Players = new Array();
+var Players;
 var State;
 var RightAnswerColor = "";
-var Questions = new Array();
-var QuestionNumber = 0;
+var Questions;
+var QuestionNumber;
 var QuestionType;
 
 function buzzerEvent(color, playerId) {
@@ -57,9 +58,47 @@ function buzzerEvent(color, playerId) {
 
     if (State === GameState.NextQuestion) {
         if (color === AnswerColor.Red) {
-            NextQuestion();
+            if (QuestionNumber === NUMBER_OF_QUESTIONS) {
+                GameOver();
+            }
+            else {
+                NextQuestion();
+            }
         }
     }
+
+    if (State === GameState.GameOver) {
+        if (color === AnswerColor.Red) {
+            sendWSCommand("RESET", -1);
+            Init();
+        }
+    }
+}
+
+function GameOver() {
+    $("#btnOK").fadeOut();
+    $("#Question").html("GAME OVER");
+    $("#Players").html("");
+    $("#Answers").hide();
+
+    Players.sort(function (a, b) {
+        return -(a.Score - b.Score);
+    });
+    
+    for (var i = 0; i < 10; i++) {
+        if (Players[i]) {
+            $("#PlayerScores").append("<div id='Player" + i + "' class='Player'><div id='Name" + i + "'></div><div id='Score" + i + "'></div></div>");
+            $("#Name" + i).html(Players[i].Name);
+            $("#Score" + i).html(Players[i].Score);
+        }
+    }
+
+    setTimeout(function () {
+        State = GameState.GameOver;
+        $("#Question").html("PRESS THE RED BUTTON TO CONTINUE");
+        $("#PlayerScores").fadeOut();
+        $("#btnOK").fadeIn();
+    }, 5000); 
 }
 
 function findPlayer(playerId) {
@@ -187,7 +226,6 @@ function NextQuestion() {
         answers.push(question.incorrect_answers[1]);
         answers.push(question.incorrect_answers[2]);
         answers = shuffle(answers);
-        console.log(answers);
 
         for (var i = 0; i < 4; i++) {
             if (answers[i] === question.correct_answer) {
@@ -225,7 +263,6 @@ function GetQuestions() {
             questions.map(function (question) {
                 Questions.push(question);
             });
-            console.log(Questions[1]);
             State = GameState.Joining;
         })
         .catch(err => { throw err; });
@@ -250,8 +287,14 @@ function shuffle(array) {
     return array;
 }
 
-function Init() {
-    initWS();
+function Init() {   
+
+    State = GameState.Joining;
+    Players = new Array();
+    Questions = new Array();
+    $("#Players").html("");
+    $("#PlayerScores").html("");
+    QuestionNumber = 0;
 
     $("#Question").html("PRESS THE RED BUTTON ON THE CONTROLLER TO JOIN THE GAME");
 
@@ -269,9 +312,10 @@ function Init() {
         animation: false
     });
 
-    GetQuestions();
+    GetQuestions();    
 }
 
 $(document).ready(function () {
+    initWS();
     Init();    
 });

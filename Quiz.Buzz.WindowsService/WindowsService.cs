@@ -1,16 +1,16 @@
 ﻿using System.ServiceProcess;
 
-namespace DebuggableWindowsService
+namespace Quiz.Buzz.WindowsService
 {
     /// <summary>
     /// Windows service class whose OnStart and OnStop methods are called 
     /// when the Windows service is started or stopped.
     /// </summary>
-    public partial class SampleWindowsService : ServiceBase
+    public partial class WindowsService : ServiceBase
     {
-        SampleBackgroundService sampleBackgroundService;
+        BackgroundService backgroundService;
 
-        public SampleWindowsService()
+        public WindowsService()
         {
             InitializeComponent();
         }
@@ -18,14 +18,14 @@ namespace DebuggableWindowsService
         //Called when the Windows service is started
         protected override void OnStart(string[] args)
         {
-            sampleBackgroundService = new SampleBackgroundService();
-            sampleBackgroundService.Start();
+            backgroundService = new BackgroundService();
+            backgroundService.Start();
         }
 
         //Called when the Windows service is stopped
         protected override void OnStop()
         {
-            sampleBackgroundService.Stop();
+            backgroundService.Stop();
         }
     }
 }

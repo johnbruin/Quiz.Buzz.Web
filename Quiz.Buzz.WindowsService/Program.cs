@@ -2,13 +2,9 @@
 using System;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DebuggableWindowsService
+namespace Quiz.Buzz.WindowsService
 {
     static class Program
     {
@@ -27,7 +23,7 @@ namespace DebuggableWindowsService
 
             logger.Info("Starting services...");
 
-            SampleBackgroundService _backgroundService = new SampleBackgroundService();
+            var _backgroundService = new BackgroundService();
             _backgroundService.Start();
 
             logger.Info("Services started. Press enter to stop...");
@@ -41,7 +37,7 @@ namespace DebuggableWindowsService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new SampleWindowsService()
+                new WindowsService()
             };
             ServiceBase.Run(ServicesToRun);
 #endif

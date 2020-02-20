@@ -1,4 +1,4 @@
-﻿namespace DebuggableWindowsService
+﻿namespace Quiz.Buzz.WindowsService
 {
     partial class ProjectInstaller
     {

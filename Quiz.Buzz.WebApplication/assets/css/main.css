@@ -29,6 +29,11 @@
     display: flex;
 }
 
+#PlayerScores {
+    display: block;
+    margin-top: 50px;
+}
+
 #Players {
     display: flex;
     position: absolute;

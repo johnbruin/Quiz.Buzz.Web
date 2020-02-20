@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.ComponentModel;
 using System.Configuration.Install;
-using System.Linq;
 using System.ServiceProcess;
-using System.Threading.Tasks;
 
-namespace DebuggableWindowsService
+namespace Quiz.Buzz.WindowsService
 {
     [RunInstaller(true)]
     public partial class ProjectInstaller : Installer
     {
-        public const string SERVICE_NAME = "Sample Background Service";
+        public const string SERVICE_NAME = "Quiz.Buzz.WindowsService";
 
         private readonly ServiceProcessInstaller m_ServiceProcessInstaller;
         private readonly ServiceInstaller m_ServiceInstaller;
 
         public ProjectInstaller()
         {
-            //Installer that installs the process (in this case 'DebuggableWindowsService.exe')
+            //Installer that installs the process (in this case 'Quiz.Buzz.WindowsService.exe')
             //There can be only one ServiceProcessInstaller
             m_ServiceProcessInstaller = new ServiceProcessInstaller();
             m_ServiceProcessInstaller.Account = ServiceAccount.LocalSystem;
