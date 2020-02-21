@@ -73,7 +73,9 @@ function setupWebSocket() {
 }
 
 function sendWSCommand(command, playerId) {
-    ws.send(command + playerId);
+    if (playerId > 0) {
+        ws.send(command + playerId);
+    }
 }
 
 function initWS() {

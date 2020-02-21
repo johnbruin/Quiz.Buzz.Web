@@ -1,4 +1,4 @@
-﻿const NUMBER_OF_QUESTIONS = 2;
+﻿var NumberOfQuestions;
 
 const GameState = {
     Joining: 0,
@@ -58,7 +58,7 @@ function buzzerEvent(color, playerId) {
 
     if (State === GameState.NextQuestion) {
         if (color === AnswerColor.Red) {
-            if (QuestionNumber === NUMBER_OF_QUESTIONS) {
+            if (QuestionNumber === NumberOfQuestions) {
                 GameOver();
             }
             else {
@@ -84,9 +84,27 @@ function GameOver() {
     Players.sort(function (a, b) {
         return -(a.Score - b.Score);
     });
-    
-    for (var i = 0; i < 10; i++) {
-        if (Players[i]) {
+
+    var winners = new Array();
+    winners.push(Players[0]);
+
+    var i;
+    for (i = 0; i < Players.length; i++) {
+
+        if (i > 0 && winners[0].Score === Players[i]) {
+            winners.push(Players[i]);
+        }
+    }
+
+    if (winners.length > 1) {
+        $("#PlayerScores").html("THE WINNERS ARE<BR /><BR />");
+    }
+    else {
+        $("#PlayerScores").html("THE WINNER IS<BR /><BR />");
+    }
+
+    for (i = 0; i < winners.length; i++) {
+        if (winners[i]) {
             $("#PlayerScores").append("<div id='Player" + i + "' class='Player'><div id='Name" + i + "'></div><div id='Score" + i + "'></div></div>");
             $("#Name" + i).html(Players[i].Name);
             $("#Score" + i).html(Players[i].Score);
@@ -96,7 +114,6 @@ function GameOver() {
     setTimeout(function () {
         State = GameState.GameOver;
         $("#Question").html("PRESS THE RED BUTTON TO CONTINUE");
-        $("#PlayerScores").fadeOut();
         $("#btnOK").fadeIn();
     }, 5000); 
 }
@@ -164,16 +181,19 @@ function Timer() {
             $("#Timer").fadeOut();
         }
         else {
+            GetQuestions();
             timeout = 0;
         }
 
         setTimeout(function () {
             State = GameState.NextQuestion;
             InitPlayers();
+            $("#trivia_settings").hide();
             $("#Answers").fadeOut();
             $("#TimerOuter").fadeOut();
             $("#Timer").fadeOut();
             $("#Question").html("PRESS THE RED BUTTON TO CONTINUE");
+            $("#btnOK").html("OK");
             $("#btnOK").fadeIn();
         }, timeout);        
     }
@@ -204,7 +224,7 @@ function NextQuestion() {
     var question = Questions[QuestionNumber];
     QuestionType = question.type;
 
-    $("#Question").html(question.question);
+    $("#Question").html("QUESTION " + (QuestionNumber + 1) + "/" + NumberOfQuestions + "<BR/>" + question.question);
 
     var correctAnswer;
     if (QuestionType === "boolean") {
@@ -254,7 +274,20 @@ function NextQuestion() {
 }
 
 function GetQuestions() {
-    let url = 'https://opentdb.com/api.php?amount=' + NUMBER_OF_QUESTIONS + '&category=9&difficulty=easy';
+
+    NumberOfQuestions = Number($("#trivia_amount").val());
+    var category = $("#trivia_category option:selected").val();
+    var difficulty = $("#trivia_difficulty option:selected").val();
+
+    console.log('GetQuestions: ' + NumberOfQuestions + '; ' + category + "; " + difficulty);
+
+    let url = 'https://opentdb.com/api.php' + '?amount=' + NumberOfQuestions;
+    if (category !== "any") {
+        url = url + '&category=' + category;
+    }
+    if (difficulty !== "any") {
+        url = url + '&difficulty=' + difficulty;
+    }
 
     fetch(url)
         .then(resp => resp.json())
@@ -263,7 +296,6 @@ function GetQuestions() {
             questions.map(function (question) {
                 Questions.push(question);
             });
-            State = GameState.Joining;
         })
         .catch(err => { throw err; });
 }
@@ -298,10 +330,13 @@ function Init() {
 
     $("#Question").html("PRESS THE RED BUTTON ON THE CONTROLLER TO JOIN THE GAME");
 
-    $("#btnOK").hide();
+    $("#btnOK").html("JOIN");
+    $("#btnOK").show();
+    
     $("#Answers").hide();
     $("#TimerOuter").hide();
     $("#Timer").hide();
+    $("#trivia_settings").show();
 
     $('#TimerOuter').circleProgress({
         startAngle: -Math.PI / 2,
@@ -310,12 +345,21 @@ function Init() {
         thickness: 5,
         size: 100,
         animation: false
-    });
+    });    
+}
 
-    GetQuestions();    
+function Click(clickedColor) {
+    //alert(clickedColor + " clicked!");
+    buzzerEvent(clickedColor, -1);
 }
 
 $(document).ready(function () {
     initWS();
-    Init();    
+    Init();
+
+    $("#btnOK").click(function () { Click(AnswerColor.Red); });
+    $("#BLUE").click(function () { Click(AnswerColor.Blue); });
+    $("#ORANGE").click(function () { Click(AnswerColor.Orange); });
+    $("#GREEN").click(function () { Click(AnswerColor.Green); });
+    $("#YELLOW").click(function () { Click(AnswerColor.Yellow); });
 });
