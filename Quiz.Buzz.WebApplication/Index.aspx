@@ -77,7 +77,10 @@
                 </select>
             
             </div>
-            <div id="PlayerScores"></div>
+            <div id="PlayerScores">
+                <div id="PlayerScoresText"></div>
+                <div id="PlayerScoresPlayers"></div>
+            </div>
             <div id="btnOK">OK</div>
         </div>
 

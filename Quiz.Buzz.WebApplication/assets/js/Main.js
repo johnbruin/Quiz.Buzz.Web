@@ -24,6 +24,7 @@ function buzzerEvent(color, playerId) {
         if (color === AnswerColor.Red) {
             if (findPlayer(playerId) < 0) {
                 if (Players.length === 0) {
+                    GetQuestions();
                     StartTimer();
                 }                
                 player = {
@@ -43,6 +44,12 @@ function buzzerEvent(color, playerId) {
     }
 
     if (State === GameState.Answering) {
+
+        //You cannot answer questions with the red button
+        if (color === "RED") {
+            return;
+        }
+
         //You cannot answer BOOLEAN questions with the green or yellow buttons
         if (QuestionType === "boolean" && (color === "GREEN" || color === "YELLOW")) {
             return;
@@ -91,21 +98,21 @@ function GameOver() {
     var i;
     for (i = 0; i < Players.length; i++) {
 
-        if (i > 0 && winners[0].Score === Players[i]) {
+        if (i > 0 && winners[0].Score === Players[i].Score) {
             winners.push(Players[i]);
         }
     }
 
     if (winners.length > 1) {
-        $("#PlayerScores").html("THE WINNERS ARE<BR /><BR />");
+        $("#PlayerScoresText").html("THE WINNERS ARE");
     }
     else {
-        $("#PlayerScores").html("THE WINNER IS<BR /><BR />");
+        $("#PlayerScoresText").html("THE WINNER IS");
     }
 
     for (i = 0; i < winners.length; i++) {
         if (winners[i]) {
-            $("#PlayerScores").append("<div id='Player" + i + "' class='Player'><div id='Name" + i + "'></div><div id='Score" + i + "'></div></div>");
+            $("#PlayerScoresPlayers").append("<div id='Player" + i + "' class='Player'><div id='Name" + i + "'></div><div id='Score" + i + "'></div></div>");
             $("#Name" + i).html(Players[i].Name);
             $("#Score" + i).html(Players[i].Score);
         }
@@ -180,8 +187,8 @@ function Timer() {
             $("#TimerOuter").fadeOut();
             $("#Timer").fadeOut();
         }
-        else {
-            GetQuestions();
+
+        if (State === GameState.Joining) { 
             timeout = 0;
         }
 
@@ -224,7 +231,7 @@ function NextQuestion() {
     var question = Questions[QuestionNumber];
     QuestionType = question.type;
 
-    $("#Question").html("QUESTION " + (QuestionNumber + 1) + "/" + NumberOfQuestions + "<BR/>" + question.question);
+    $("#Question").html("QUESTION " + (QuestionNumber + 1) + " OF " + NumberOfQuestions + "<BR/>" + question.question);
 
     var correctAnswer;
     if (QuestionType === "boolean") {
@@ -289,12 +296,15 @@ function GetQuestions() {
         url = url + '&difficulty=' + difficulty;
     }
 
+    console.log(url);
+
     fetch(url)
         .then(resp => resp.json())
         .then(function (data) {
             questions = data.results;
             questions.map(function (question) {
                 Questions.push(question);
+                console.log("Question " + Questions.length + " of " + NumberOfQuestions + " added.");
             });
         })
         .catch(err => { throw err; });
@@ -325,7 +335,8 @@ function Init() {
     Players = new Array();
     Questions = new Array();
     $("#Players").html("");
-    $("#PlayerScores").html("");
+    $("#PlayerScoresText").html("");
+    $("#PlayerScoresPlayers").html("");
     QuestionNumber = 0;
 
     $("#Question").html("PRESS THE RED BUTTON ON THE CONTROLLER TO JOIN THE GAME");
@@ -349,7 +360,6 @@ function Init() {
 }
 
 function Click(clickedColor) {
-    //alert(clickedColor + " clicked!");
     buzzerEvent(clickedColor, -1);
 }
 

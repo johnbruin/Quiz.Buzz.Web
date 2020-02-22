@@ -33,9 +33,19 @@
     margin: 0 auto;
 }
 
+#PlayerScoresText {
+    text-align: center;
+}
+
+#PlayerScoresPlayers {
+    margin: 30px auto;
+    display: flex;
+}
+
 #Players {
     position: absolute;
     bottom: 0;
+    display: flex;
 }
 .Player {
     border: 5px solid;
@@ -47,6 +57,7 @@
     font-size: 18px;
 }
     .Player div {
+        width: 90px;
         text-align: center;
     }
     .Player.Active {
