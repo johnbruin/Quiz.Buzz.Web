@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 
-    <title>Buzz</title>
+    <title>Quiz Buzz</title>
 
     <link href="assets/css/main.css" rel="stylesheet" />
 
@@ -13,6 +13,8 @@
     <script src="assets/js/circle-progress.min.js"></script>
     <script src="assets/js/WebSocketCommunication.js"></script>
     <script src="assets/js/Main.js"></script>
+    <script src="assets/js/howler.core.min.js"></script>
+
     <script>
         var WebSocketServerURL = '<%=System.Configuration.ConfigurationManager.AppSettings("WebSocketServerURL").ToString() %>';
     </script>

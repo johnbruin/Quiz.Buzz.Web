@@ -12,9 +12,14 @@ var sec;
 var Players;
 var State;
 var RightAnswerColor = "";
+
 var Questions;
 var QuestionNumber;
 var QuestionType;
+
+var AnsweringSound;
+var TimeOverSound;
+var GameOverSound;
 
 function buzzerEvent(color, playerId) {
     var player;
@@ -24,6 +29,7 @@ function buzzerEvent(color, playerId) {
         if (color === AnswerColor.Red) {
             if (findPlayer(playerId) < 0) {
                 if (Players.length === 0) {
+                    IntroSound.play();
                     GetQuestions();
                     StartTimer();
                 }                
@@ -167,6 +173,8 @@ function Timer() {
     else {
         var timeout = 5000; 
         if (State === GameState.Answering) {
+            AnsweringSound.stop();
+            TimeOverSound.play();
 
             //Show correct answer
             $("#Answers li").addClass("Wrong");
@@ -235,7 +243,7 @@ function NextQuestion() {
 
     var correctAnswer;
     if (QuestionType === "boolean") {
-        if (question.correctanswer === "True") {
+        if (question.correct_answer === "True") {
             correctAnswer = 0;
         }
         else {
@@ -272,6 +280,8 @@ function NextQuestion() {
     $("#Answers li").removeClass("Wrong");
     setAnswers(correctAnswer);
     State = GameState.Answering;
+    IntroSound.stop();
+    AnsweringSound.play();
     StartTimer();
 
     $("#Question").show();
@@ -363,9 +373,29 @@ function Click(clickedColor) {
     buzzerEvent(clickedColor, -1);
 }
 
+function InitSound() {
+
+    IntroSound = new Howl({
+        src: ['assets/sound/Fruitbank_T001.sid_MOS6581R3.mp3']
+    });
+
+    GameOverSound = new Howl({
+        src: ['assets/sound/Parallax_T002.sid_MOS6581R2.mp3']
+    });
+
+    AnsweringSound = new Howl({
+        src: ['assets/sound/Super_Trucker_T001.sid_MOS6581R2.mp3']
+    });
+
+    TimeOverSound = new Howl({
+        src: ['assets/sound/Fruitbank_T003.sid_MOS6581R3.mp3']
+    });
+}
+
 $(document).ready(function () {
     initWS();
     Init();
+    InitSound();
 
     $("#btnOK").click(function () { Click(AnswerColor.Red); });
     $("#BLUE").click(function () { Click(AnswerColor.Blue); });

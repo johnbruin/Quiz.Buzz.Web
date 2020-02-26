@@ -39,8 +39,11 @@
 
 #PlayerScoresPlayers {
     margin: 30px auto;
-    display: flex;
+    text-align: center
 }
+    #PlayerScoresPlayers .Player {
+        display: inline-block;
+    }
 
 #Players {
     position: absolute;

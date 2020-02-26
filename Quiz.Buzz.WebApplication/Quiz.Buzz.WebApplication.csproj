@@ -70,9 +70,17 @@
   <ItemGroup>
     <Content Include="assets\css\main.css" />
     <Content Include="assets\js\circle-progress.min.js" />
+    <Content Include="assets\js\howler.core.min.js" />
     <Content Include="assets\js\jquery-2.1.0.min.js" />
     <Content Include="assets\js\Main.js" />
     <Content Include="assets\js\WebSocketCommunication.js" />
+    <Content Include="assets\sound\Fruitbank_T001.sid_MOS6581R3.mp3" />
+    <Content Include="assets\sound\Fruitbank_T002.sid_MOS6581R3.mp3" />
+    <Content Include="assets\sound\Fruitbank_T003.sid_MOS6581R3.mp3" />
+    <Content Include="assets\sound\Fruitbank_T005.sid_MOS6581R3.mp3" />
+    <Content Include="assets\sound\Fruitbank_T027.sid_MOS6581R3.mp3" />
+    <Content Include="assets\sound\Parallax_T002.sid_MOS6581R2.mp3" />
+    <Content Include="assets\sound\Super_Trucker_T001.sid_MOS6581R2.mp3" />
     <Content Include="Index.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -101,6 +109,7 @@
     </None>
     <Content Include="WebSocketServer\WebSocketServer.ashx" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
