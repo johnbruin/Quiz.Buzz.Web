@@ -1,4 +1,4 @@
-﻿namespace Quizz.Buzz
+﻿namespace Quiz.Buzz.Usb
 {
     public enum AnswerColor
     {

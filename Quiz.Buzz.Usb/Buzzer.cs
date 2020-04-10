@@ -2,7 +2,7 @@
 using System.Threading;
 using HidLibrary;
 
-namespace Quizz.Buzz
+namespace Quiz.Buzz.Usb
 {
     public class Buzzer
     {

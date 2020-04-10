@@ -1,36 +1,49 @@
 ﻿using log4net;
 using Quiz.Buzz.Usb;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
 using WebSocketSharp;
 
-namespace Quiz.Buzz.WindowsService
+namespace Quiz.Buzz.SystemTrayApp
 {
-    /// <summary>
-    /// Contains actual background operations that our Windows service performs
-    /// </summary>
-    class BackgroundService
+    public class LogEventArgs : EventArgs
     {
+        public string Message { get; set; }
+    }
+
+    /// <summary>
+    /// Contains actual background operations that our system tray application performs
+    /// </summary>
+    public class BackgroundService
+    {
+        public event EventHandler<LogEventArgs> LogChanged;
+
+        //PlayStation Buzzer Manager
+        public BuzzerManager BuzzerManager = new BuzzerManager();
+
+        public string WebSocketUrl;
+
+        private List<string> _log = new List<string>();
+
         //Get a logger for this class from log4net LogManager
         private static ILog logger = LogManager.GetLogger(typeof(BackgroundService));
 
         //Web Socket
         private static WebSocket ws;
-
-        //PlayStation Buzzer Manager
-        private static BuzzerManager buzzerManager = new BuzzerManager();
-        readonly bool stopRequested;
+        
+        private bool stopRequested;
         Thread thread;
 
         //Starts the thread
         public void Start()
         {
-            logger.Info("Start called.");
+            LogMessage("Start called");
 
             //Try to connect to the websocket server
-            var url = ConfigurationManager.AppSettings.Get("WebSocketServerURL");
-            ws = new WebSocket(url);
+            WebSocketUrl = ConfigurationManager.AppSettings.Get("WebSocketServerURL");
+            ws = new WebSocket(WebSocketUrl);
             ws.Connect();
 
             if (ws.IsAlive)
@@ -42,34 +55,35 @@ namespace Quiz.Buzz.WindowsService
 
         private void Ws_OnError(object sender, ErrorEventArgs e)
         {
-            logger.Info(e.Message);
+            LogMessage(e.Message);
         }
 
         //Stops the thread
         public void Stop()
         {
-            logger.Debug("Stop called.");
+            stopRequested = true;
+            LogMessage("Stop called");
             thread.Abort();
         }
 
         //Service thread that performs background tasks and writes logs
         private void ServiceThread()
         {
-            logger.Info("Service thread started.");
+            LogMessage("Service thread started");
 
             //Wait for Initialization of the BuzzerManager
-            buzzerManager.WaitForInitialization();
-            logger.Info("Buzzers initialized.");
+            BuzzerManager.WaitForInitialization();
+            LogMessage("Buzzers initialized");
 
             //Connected
             ws.Send("SERVER");
-            logger.Info("Websocket connected.");
+            LogMessage("Connected with " + ws.Url.OriginalString);
 
             //Receive a message
             ws.OnMessage += Ws_OnMessage;
 
             //Send a message
-            buzzerManager.OnAnswerClick += BuzzerManager_OnAnswerClick;
+            BuzzerManager.OnAnswerClick += BuzzerManager_OnAnswerClick;
 
             while (!stopRequested)
             {
@@ -77,55 +91,74 @@ namespace Quiz.Buzz.WindowsService
                     break;
             }
 
-            logger.Info("Service thread exiting.");
+            LogMessage("Service thread exiting");
         }
 
         private void BuzzerManager_OnAnswerClick(object sender, AnswerClickEventArgs ace)
         {
             var message = ace.Answer.ToString().ToUpper() + ace.PlayerId.ToString();
-            logger.Info(message);
+            LogMessage(message);
             ws.Send(message);
         }
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
-            logger.Info(e.Data);
-
             if (e.Data.StartsWith("CLIENT") || e.Data.StartsWith("RESET"))
             {
-                buzzerManager.AllLightOff();
+                LogMessage("Received: " + e.Data);
+                BuzzerManager.AllLightOff();
             }
 
             if (e.Data.StartsWith("LIGHTSWITCH"))
             {
+                LogMessage("Received: " + e.Data);
                 short.TryParse(e.Data.Replace("LIGHTSWITCH", string.Empty), out short playerId);
-                if (buzzerManager.IsLightOn(playerId))
+                if (BuzzerManager.IsLightOn(playerId))
                 {
-                    buzzerManager.SetLightOff(playerId);
+                    BuzzerManager.SetLightOff(playerId);
                 }
                 else
                 {
-                    buzzerManager.SetLightOn(playerId);
+                    BuzzerManager.SetLightOn(playerId);
                 }
             }
 
             if (e.Data.StartsWith("LIGHTFLASH"))
             {
+                LogMessage("Received: " + e.Data);
                 short.TryParse(e.Data.Replace("LIGHTFLASH", string.Empty), out short playerId);
-                buzzerManager.FlashLight(playerId);
+                BuzzerManager.FlashLight(playerId);
             }
 
             if (e.Data.StartsWith("LIGHTON"))
             {
+                LogMessage("Received: " + e.Data);
                 short.TryParse(e.Data.Replace("LIGHTON", string.Empty), out short playerId);
-                buzzerManager.SetLightOn(playerId);
+                BuzzerManager.SetLightOn(playerId);
             }
 
             if (e.Data.StartsWith("LIGHTOFF"))
             {
+                LogMessage("Received: " + e.Data);
                 short.TryParse(e.Data.Replace("LIGHTOFF", string.Empty), out short playerId);
-                buzzerManager.SetLightOff(playerId);
+                BuzzerManager.SetLightOff(playerId);
             }
+        }
+
+        private void LogMessage(string message)
+        {
+            _log.Add(message);
+            logger.Info(message);
+            var args = new LogEventArgs
+            {
+                Message = message
+            };
+            OnLogChanged(args);
+        }
+
+        protected virtual void OnLogChanged(LogEventArgs e)
+        {
+            LogChanged?.Invoke(this, e);
         }
     }
 }

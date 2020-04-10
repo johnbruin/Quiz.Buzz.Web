@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Quizz.Buzz
+namespace Quiz.Buzz.Usb
 {
     public class AnswerClickEventArgs : EventArgs
     {

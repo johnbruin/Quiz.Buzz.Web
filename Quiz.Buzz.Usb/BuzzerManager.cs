@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Quizz.Buzz
+namespace Quiz.Buzz.Usb
 {
     public class BuzzerManager
     {
